@@ -20,5 +20,43 @@ namespace EjemploPosgres.Modelos.Entidades
         
         [RegularExpression(@"^\d{4}-\d{4}$", ErrorMessage = "El formato debe ser 0000-0000")]
         public string Telefono { get; set; }
+
+        [FechaFutura(2, ErrorMessage = "La reserva debe hacerse con al menos 2 días de anticipación.")]
+        public DateTime FechaReserva { get; set; }
+
     }
+
+
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field,
+    AllowMultiple = false)]
+    public class FechaFuturaAttribute : ValidationAttribute
+    {
+        private readonly int _diasMinimos;
+
+        public FechaFuturaAttribute(int diasMinimos = 0)
+        {
+            _diasMinimos = diasMinimos;
+            ErrorMessage = $"La fecha debe ser al menos {diasMinimos} día(s) en el futuro.";
+        }
+
+        protected override ValidationResult? IsValid(
+            object? value,
+            ValidationContext validationContext)
+        {
+            if (value is null) return ValidationResult.Success;
+
+            if (value is not DateTime fecha)
+                return new ValidationResult("El valor debe ser una fecha válida.");
+
+            var fechaMinima = DateTime.UtcNow.AddDays(_diasMinimos);
+
+            if (fecha < fechaMinima)
+                return new ValidationResult(
+                    FormatErrorMessage(validationContext.DisplayName),
+                    new[] { validationContext.MemberName! });
+
+            return ValidationResult.Success;
+        }
+    }
+
 }
