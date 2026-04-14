@@ -24,6 +24,9 @@ namespace EjemploPosgres.Modelos.Entidades
         [FechaFutura(2, ErrorMessage = "La reserva debe hacerse con al menos 2 días de anticipación.")]
         public DateTime FechaReserva { get; set; }
 
+        public int Edad { get; set; }
+
+
     }
 
 
