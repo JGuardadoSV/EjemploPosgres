@@ -24,6 +24,9 @@ namespace EjemploPosgres.Modelos.Entidades
         [FechaFutura(2, ErrorMessage = "La reserva debe hacerse con al menos 2 días de anticipación.")]
         public DateTime FechaReserva { get; set; }
 
+
+        //Validacion personalizada si es mayor de edad >=18
+        [MayorDeEdad(18, ErrorMessage = "La persona debe ser mayor de edad")]
         public int Edad { get; set; }
 
 
@@ -61,5 +64,36 @@ namespace EjemploPosgres.Modelos.Entidades
             return ValidationResult.Success;
         }
     }
+
+
+    // validacion personalizada para detectar si es mayor de edad
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field,
+    AllowMultiple = false)]
+    public class MayorDeEdadAttribute : ValidationAttribute
+    {
+        private readonly int _edadMimina;
+
+        public MayorDeEdadAttribute(int edadMinima = 18)
+        {
+            _edadMimina = edadMinima;
+            ErrorMessage = $"La edad debe ser al menos {edadMinima} años.";
+        }
+
+        protected override ValidationResult? IsValid(
+            object? value,
+            ValidationContext validationContext)
+        {
+            if (value is null) return ValidationResult.Success;
+
+
+            if ((int) value < 18 )
+                return new ValidationResult(
+                    FormatErrorMessage(validationContext.DisplayName),
+                    new[] { validationContext.MemberName! });
+
+            return ValidationResult.Success;
+        }
+    }
+
 
 }
