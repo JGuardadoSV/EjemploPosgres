@@ -6,7 +6,11 @@ namespace EjemploPosgres.Modelos.Contexto
 {
     public class Contexto : DbContext
     {
-        public Contexto(DbContextOptions<Contexto> options): base(options) { }
+        public Contexto(DbContextOptions<Contexto> options): base(options) {
+           
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+        }
 
         public DbSet<Persona> Personas { get; set; }
         
